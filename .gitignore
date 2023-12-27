@@ -1,3 +1,23 @@
+# Virtual Environments
+# venv*
+
+# Data
+# data/
+
+# Logs (text files or other output files)
+logs/
+wandb/
+tensorboard/
+
+# Hydra config files
+.hydra/
+outputs/
+
+# Personal development files usefull for debugging
+personal*
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -122,7 +142,6 @@ celerybeat.pid
 # Environments
 .env
 .venv
-env/
 venv/
 ENV/
 env.bak/

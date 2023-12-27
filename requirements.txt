@@ -1,0 +1,11 @@
+# Logging 
+matplotlib 
+tqdm
+wandb
+tensorboardX
+
+# Config system
+hydra-core
+
+# Common libraries
+numpy
