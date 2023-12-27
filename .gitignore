@@ -1,8 +1,8 @@
 # Virtual Environments
-# venv*
+venv*
 
 # Data
-# data/
+data/
 
 # Logs (text files or other output files)
 logs/
