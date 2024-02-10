@@ -20,7 +20,7 @@ import numpy as np
 from folder_tasks import task_name_to_TaskClass
 from folder_solvers import solver_name_to_SolverClass
 from folder_metrics import metrics_name_to_MetricsClass
-
+from src.time_measure import RuntimeMeter
 
 @hydra.main(config_path="configs", config_name="config_default.yaml")
 def main(config : DictConfig):
@@ -63,36 +63,34 @@ def main(config : DictConfig):
             )
     if do_tb:
         tb_writer = SummaryWriter(log_dir=f"tensorboard/{run_name}")    
-
-    # Iterate n_iterations times.
-    cumulative_training_time = 0
     
     # Training loop
     for iteration in tqdm(range(n_iterations), disable=not do_tqdm):
         # Get the clustering result. Measure the time it takes to get the clustering result.
-        time_start_training = time()
-        clustering_result = solver.fit(x_data=x_data)
-        run_time = time() - time_start_training
-        cumulative_training_time += run_time
+        with RuntimeMeter("solver") as rm:
+            clustering_result = solver.fit(x_data=x_data)
 
         # Log metrics.
         for metric_name, metric in metrics.items():
-            metric_result = metric.compute_metrics(
-                dataset=task, 
-                clustering_result=clustering_result,
-                algo=solver,
-                )
-            if do_wandb:
-                cumulative_training_time_in_ms = int(cumulative_training_time * 1000)
-                wandb.log(metric_result, step=cumulative_training_time_in_ms)
-                wandb.log({"time_training" : run_time, "iteration" : iteration}, step=cumulative_training_time_in_ms)
-            if do_tb:
-                for metric_name, metric_result in metric_result.items():
-                    tb_writer.add_scalar(f"metrics/{metric_name}", metric_result, global_step=cumulative_training_time)
-                tb_writer.add_scalar("time_training", run_time, global_step=cumulative_training_time)
-                tb_writer.add_scalar("iteration", iteration, global_step=cumulative_training_time)
-            if do_cli:
-                print(f"Metric results at iteration {iteration} for metric {metric_name}: {metric_result}")
+            with RuntimeMeter("metric") as rm:
+                metric_result = metric.compute_metrics(
+                    dataset=task, 
+                    clustering_result=clustering_result,
+                    algo=solver,
+                    )
+            metric["solver_time"] = rm.get_stage_runtime("solver")
+            metric["metric_time"] = rm.get_stage_runtime("metric")
+            metric["log_time"] = rm.get_stage_runtime("log")
+            metric["iteration"] = iteration
+            with RuntimeMeter("log") as rm:
+                if do_wandb:
+                    cumulative_solver_time_in_ms = int(rm.get_stage_runtime("solver") * 1000)
+                    wandb.log(metric_result, step=cumulative_solver_time_in_ms)
+                if do_tb:
+                    for metric_name, metric_result in metric_result.items():
+                        tb_writer.add_scalar(f"metrics/{metric_name}", metric_result, global_step=rm.get_stage_runtime("solver"))
+                if do_cli:
+                    print(f"Metric results at iteration {iteration} for metric {metric_name}: {metric_result}")
 
     # Finish the WandB run.
     if do_wandb:
