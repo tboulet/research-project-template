@@ -63,10 +63,9 @@ def main(config : DictConfig):
 
     # Iterate n_iterations times.
     cumulative_training_time = 0
-    iterator = range(n_iterations) if not do_tqdm else tqdm(range(n_iterations))
     
     # Training loop
-    for iteration in iterator:
+    for iteration in tqdm(range(n_iterations), disable=not do_tqdm):
         # Get the clustering result. Measure the time it takes to get the clustering result.
         time_start_training = time()
         clustering_result = solver.fit(x_data=x_data)
