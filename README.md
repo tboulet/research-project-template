@@ -12,7 +12,8 @@ The repository is structured as follows. Each point is detailed below.
 │ └─ personal_config.yaml   <- Your personal configuration file, ignored by git and that you can change as you wish for debugging
 ├── src             <- Source code for use in this project
 ├── data            <- Data folder, ignored by git
-├── logs           <- Logs folder, ignored by git (tensorboard, wandb, CSVs, ...)
+├── logs           <- Logs folder, ignored by git (tensorboard?, wandb, CSVs, ...)
+├── tensorboard    <- Tensorboard logs folder, ignored by git
 ├── venv           <- Virtual environment folder, ignored by git
 ├── requirements.txt  <- The requirements file for reproducing the analysis environment
 ├── LICENSE        <- License file
@@ -46,10 +47,17 @@ Logging is a very important part of a project. It allows to keep track of the ex
 ### WandB
 WandB is a very powerful tool for logging. It is flexible, logs everything online, can be used to compare experiments or group those by dataset or algorithm, etc. You can also be several people to work on the same project and share the results directly on line. It is also very easy to use, and can be used with a few lines of code.
 
+The metrics will be logged in the project `wandb_config['project']` with entity `wandb_config['entity']`.
+
 Cons : it can sometimes be slow to start. It also makes the CTRL+C command buggy sometimes.
 
 ### Tensorboard
 Tensorboard is a tool from Tensorflow that allows to visualize the training. It is usefull during the development phase, to check that everything is working as expected. It is also very easy to use, and can be used with a few lines of code.
+
+You can visualize the logs by running the following command in the terminal.
+```bash
+tensorboard --logdir=tensorboard
+```
 
 Cons : it does not log everything online, and it is hard to compare experiments.
 
@@ -57,3 +65,21 @@ Cons : it does not log everything online, and it is hard to compare experiments.
 CSV files are a simple way to log the results. It is good practice to log the results in a CSV file, be it for using the results later.
 
 Cons : it is hard to compare experiments, and it is not very flexible.
+
+# Macros
+
+Command line macros are extremely useful to avoid typing the same commands over and over again. 
+
+#### Linux
+
+On Linux, you can create a macro by adding lines in the file ``~/.bashrc``. For example, the following lines create a macro to create the virtual environment and, one to run the code with my personal configuration.
+
+```bash
+alias venv="python3 -m venv venv && source venv/bin/activate"
+alias run="python run.py --config-name personal_config"
+```
+
+#### Windows
+On Windows, one method that worked well was to follow this StackOverflow [answer](https://superuser.com/questions/1134368/create-permanent-doskey-in-windows-cmd#:~:text=Create%20a%20file%20to%20store%20your%20macros%20(DOSKEYs).) by the user John DeBord.
+
+Some windows macros that i use can be found in the `usefull_files_for_a_project/macros.doskey` file.

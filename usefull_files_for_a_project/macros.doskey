@@ -1,0 +1,49 @@
+ls=dir $*
+up=cd ..
+upp=cd ../..
+ex=exit
+..=cd ..
+touch=type nul > $*
+user=cd C:\Users\timot
+mv=move $*
+rm=del $*   
+gs=git status
+ga=git add $*
+gc=git commit -m $*
+gpush=git push
+gpull=git pull
+
+python=py $*
+pip=py -m pip $*
+venv=py -m venv venv && venv\Scripts\activate
+pip_reqs=py -m pip install -r requirements.txt
+pip_torch=py -m pip --no-cache-dir install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+pip_tf=py -m pip install "tensorflow<2.11"
+pip_basics=py -m pip install numpy scipy matplotlib tqdm wandb scikit-learn
+pip_cv2=py -m pip install opencv-python
+pip_plt=py -m pip install matplotlib
+
+activate=venv\Scripts\activate
+tb=tensorboard --logdir=tensorboard
+pypi=py -m pip install build twine && python -m build && python -m twine upload dist/*
+test_tf=python -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
+test_torch=python -c "import torch"
+gpu_torch=python -c "import torch; print(torch.cuda.is_available())"
+gpu_tf=python -c "import tensorflow as tf; print(tf.config.list_physical_devices())"
+
+sna=snakeviz logs\profile.prof    
+ipynb2py=jupyter nbconvert $1 --to script
+
+# Access to usefull files/folders
+macros=code C:\bat\macros.doskey
+pro=cd C:\Users\timot\projects
+cou=cd C:\Users\timot\courses
+debugger=code C:\Users\timot\projects\debugger
+papers=code C:\Users\timot\projects\papers
+
+
+# Run scripts
+run=python run.py --config-name=personal_config do_wandb=False $*
+srun=python run.py --config-name personal_config do_wandb=False $* && snakeviz logs\profile.prof
+run_wandb=python run.py --config-name personal_config do_wandb=True $*
+pers=python personal_test.py
