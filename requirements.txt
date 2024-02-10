@@ -1,6 +1,7 @@
-# Logging 
+# Logging and monitoring
 matplotlib 
 tqdm
+snakeviz
 wandb
 tensorboardX
 

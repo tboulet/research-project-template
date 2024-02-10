@@ -1,10 +1,3 @@
-import argparse
-import datetime
-from time import time
-from typing import Dict, Type
-import numpy as np
-from tqdm import tqdm
-
 # Logging
 import wandb
 from tensorboardX import SummaryWriter
@@ -13,7 +6,17 @@ from tensorboardX import SummaryWriter
 import hydra
 from omegaconf import OmegaConf, DictConfig
 
+# Utils
+from tqdm import tqdm
+import datetime
+from time import time
+from typing import Dict, Type
+import cProfile
 
+# ML libraries
+import numpy as np
+
+# Project imports
 from folder_tasks import task_name_to_TaskClass
 from folder_solvers import solver_name_to_SolverClass
 from folder_metrics import metrics_name_to_MetricsClass
@@ -97,4 +100,9 @@ def main(config : DictConfig):
 
 
 if __name__ == "__main__":
-    main()
+    with cProfile.Profile() as pr:
+        main()
+    pr.print_stats()
+    pr.dump_stats("logs/profile_stats.prof")
+    print("Profile stats dumped to profile_stats.prof")
+    print("You can visualize the profile stats using snakeviz by running 'snakeviz logs/profile_stats.prof'")
