@@ -1,5 +1,11 @@
 # research-project-template
-A template repository, for the objective of combining research and good code practice. It focuses on code structure, modularity, configuration system (Hydra) and logging (tensorboard and WandB)
+A template repository, for the objective of combining research and good code practice.
+
+-   [**Code structure and modularity**](#repository-structure)
+-   [**Virtual environment**](#virtual-environment)
+-   [**Configuration system (Hydra)**](#configuration-system)
+-   [**Logging (tensorboard, WandB, command line)**](#logging)
+-   [**Other tips (macros, ...)**](#macros)
 
 # Repository structure
 The repository is structured as follows. Each point is detailed below.
@@ -42,7 +48,7 @@ venv\Scripts\activate.bat  # for windows
 pip install -r requirements.txt
 ```
 
-# Configuration system : Hydra
+# Configuration system
 
 For a clean way of interacting with the code, it is advised to implement a Command Line Interface (CLI) and a configuration system. A simple approach is to use the ``argparse``, but I suggest to use [Hydra](https://hydra.cc/). Hydra is a framework that allows to easily create a CLI and a configuration system. It is very powerful and flexible, and allows to create a configuration tree.
 
@@ -112,3 +118,25 @@ Some windows macros that i use can be found in the `usefull_files_for_a_project/
 # Personal files
 
 I advice to use files gitignored (there is a `personal_*` field in the `.gitignore` file) to store personal files, such as notes, debugging scripts, etc. It is a good practice to keep the repository clean and organized.
+
+# cProfile and SnakeViz
+
+cProfile is a module that allows to profile the code. It is very useful to find bottlenecks in the code, and to optimize it. As a developer that wants to optimize the speed of its code, your only criteria for 'how make my code faster' should be how much time the program spend on this function. Note : this is not necessarily the most frequent function.
+
+You can use cProfile by adding the following lines in your code.
+
+```python
+import cProfile
+with cProfile.Profile() as pr:
+    main()  # your code, here it is the main function
+pr.print_stats()
+pr.dump_stats('logs/profile.prof')
+```
+
+SnakeViz is a tool that allows to visualize the results of cProfile and so what you should focus. It is used through the terminal.
+
+```bash
+snakeviz logs/profile.prof
+```
+
+In development phase, I often create a macro that run the code with my personal config and then run the snakeviz command for visualizing the profiling results.

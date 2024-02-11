@@ -1,12 +1,19 @@
-# Logging and monitoring
-matplotlib 
-tqdm
+# Monitoring
 snakeviz
-wandb
-tensorboardX
 
 # Config system
 hydra-core
+
+# Code quality
+black
+
+# Logging
+wandb
+tensorboardX
+
+# Utils
+matplotlib 
+tqdm
 
 # Common libraries
 numpy
