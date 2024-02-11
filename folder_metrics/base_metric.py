@@ -8,8 +8,8 @@ class BaseMetric(ABC):
         
     @abstractmethod
     def compute_metrics(self, 
-                        dataset, 
-                        clustering_result : Dict[int, List[int]],
+                        task, 
+                        y_pred : Dict[int, List[int]],
                         algo : BaseSolver,
                         ) -> Dict[str, float]:
         """Example of abstract method for computing metrics.

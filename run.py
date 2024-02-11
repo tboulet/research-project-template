@@ -27,8 +27,8 @@ def main(config : DictConfig):
 
     # Get the config values from the config object.
     config = OmegaConf.to_container(config, resolve=True)
-    algo_name : str = config["algo"]["name"]
-    dataset_name : str = config["dataset"]["name"]
+    solver_name : str = config["solver"]["name"]
+    task_name : str = config["task"]["name"]
     n_iterations : int = config["n_iterations"]
     do_cli : bool = config["do_cli"]
     do_wandb : bool = config["do_wandb"]
@@ -39,21 +39,21 @@ def main(config : DictConfig):
     
     
     # Get the solver
-    SolverClass = solver_name_to_SolverClass[algo_name]
-    solver = SolverClass(config = config["algo"]["config"])
+    SolverClass = solver_name_to_SolverClass[solver_name]
+    solver = SolverClass(config = config["solver"]["config"])
     
     # Create the dataset
-    TaskClass = task_name_to_TaskClass[dataset_name]
-    task = TaskClass(config["dataset"]["config"])
+    TaskClass = task_name_to_TaskClass[task_name]
+    task = TaskClass(config["task"]["config"])
     x_data = task.get_x_data()
     
     # Create the metrics
-    metrics = {metric_name : MetricsClass(config["metrics"][metric_name]) for metric_name, MetricsClass in metrics_name_to_MetricsClass.items()}
+    metrics = {metric_name : MetricsClass(**config["metrics"][metric_name]) for metric_name, MetricsClass in metrics_name_to_MetricsClass.items()}
 
 
 
     # Initialize loggers
-    run_name = f"[{algo_name}]_[{dataset_name}]_{datetime.datetime.now().strftime('%dth%mmo_%Hh%Mmin%Ss')}_seed{np.random.randint(1000)}"
+    run_name = f"[{solver_name}]_[{task_name}]_{datetime.datetime.now().strftime('%dth%mmo_%Hh%Mmin%Ss')}_seed{np.random.randint(1000)}"
     print(f"Starting run {run_name}")
     if do_wandb:
         run = wandb.init(
@@ -66,22 +66,25 @@ def main(config : DictConfig):
     
     # Training loop
     for iteration in tqdm(range(n_iterations), disable=not do_tqdm):
-        # Get the clustering result. Measure the time it takes to get the clustering result.
+        # Get the solver result, and measure the time.
         with RuntimeMeter("solver") as rm:
-            clustering_result = solver.fit(x_data=x_data)
+            y_pred = solver.fit(x_data=x_data)
 
         # Log metrics.
         for metric_name, metric in metrics.items():
+            metric_result_dict = {}
             with RuntimeMeter("metric") as rm:
                 metric_result = metric.compute_metrics(
-                    dataset=task, 
-                    clustering_result=clustering_result,
+                    task=task, 
+                    y_pred=y_pred,
                     algo=solver,
                     )
-            metric["solver_time"] = rm.get_stage_runtime("solver")
-            metric["metric_time"] = rm.get_stage_runtime("metric")
-            metric["log_time"] = rm.get_stage_runtime("log")
-            metric["iteration"] = iteration
+                metric_result_dict.update(metric_result)
+            metric_result["solver_time"] = rm.get_stage_runtime("solver")
+            metric_result["metric_time"] = rm.get_stage_runtime("metric")
+            metric_result["log_time"] = rm.get_stage_runtime("log")
+            metric_result["iteration"] = iteration
+            print(metric_result)
             with RuntimeMeter("log") as rm:
                 if do_wandb:
                     cumulative_solver_time_in_ms = int(rm.get_stage_runtime("solver") * 1000)
@@ -100,7 +103,6 @@ def main(config : DictConfig):
 if __name__ == "__main__":
     with cProfile.Profile() as pr:
         main()
-    pr.print_stats()
     pr.dump_stats("logs/profile_stats.prof")
     print("Profile stats dumped to profile_stats.prof")
     print("You can visualize the profile stats using snakeviz by running 'snakeviz logs/profile_stats.prof'")

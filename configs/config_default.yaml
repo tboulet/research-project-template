@@ -1,8 +1,8 @@
 # Hyperparameters
-n_iterations : 1000
+n_iterations : 10
 
 # Logging
-do_wandb : True
+do_wandb : False
 wandb_config:
   project : wandb_project_example
   entity : wandb_entity_example

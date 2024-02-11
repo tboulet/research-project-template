@@ -40,6 +40,25 @@ pip install -r requirements.txt
 
 For a clean way of interacting with the code, it is advised to implement a Command Line Interface (CLI) and a configuration system. A simple approach is to use the ``argparse``, but I suggest to use [Hydra](https://hydra.cc/). Hydra is a framework that allows to easily create a CLI and a configuration system. It is very powerful and flexible, and allows to create a configuration tree.
 
+On this project for example, you can use the following command to run the code with the configuration `personal_config` in the `configs` folder.
+
+```bash
+python run.py --config-name personal_config
+```
+
+Or run the code with the default configuration but with a certain solver on a certain task :
+
+```bash
+python run.py solver=linear task=brownian
+```
+
+You can also modify config parameters of the configuration file by using the following command :
+
+```bash
+python run.py solver=linear task=brownian solver.lr=0.01
+```
+
+
 # Logging 
 
 Logging is a very important part of a project. It allows to keep track of the experiments, to debug, to compare the results, to reproduce the results, etc.
@@ -83,3 +102,7 @@ alias run="python run.py --config-name personal_config"
 On Windows, one method that worked well was to follow this StackOverflow [answer](https://superuser.com/questions/1134368/create-permanent-doskey-in-windows-cmd#:~:text=Create%20a%20file%20to%20store%20your%20macros%20(DOSKEYs).) by the user John DeBord.
 
 Some windows macros that i use can be found in the `usefull_files_for_a_project/macros.doskey` file.
+
+# Personal files
+
+I advice to use files gitignored (there is a `personal_*` field in the `.gitignore` file) to store personal files, such as notes, debugging scripts, etc. It is a good practice to keep the repository clean and organized.

@@ -14,6 +14,6 @@ class BaseTask(ABC):
         """
         
     @abstractmethod
-    def get_labels(self) -> Union[np.ndarray, None]:
+    def get_labels(self) -> np.ndarray:
         """Example of abstract method.
         """

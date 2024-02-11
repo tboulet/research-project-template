@@ -41,7 +41,7 @@ class RuntimeMeter:
         elif stage_name not in RuntimeMeter.stage_name_to_runtime:
             return 0
         else:
-            RuntimeMeter.stage_name_to_runtime[stage_name]
+            return RuntimeMeter.stage_name_to_runtime[stage_name]
 
     def __init__(self, stage_name: str):
         self.stage_name = stage_name
