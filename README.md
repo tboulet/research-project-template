@@ -21,6 +21,12 @@ The repository is structured as follows. Each point is detailed below.
 └── personal_files <- Personal files, ignored by git (e.g. notes, debugging test scripts, ...)
 ```
 
+The main point in this architecture is that you combine agnostically solvers, tasks, and metrics. You could add, change or remove those concepts if they don't fit your training paradigm. 
+
+For the solver, for example, you can easily add a new solver by adding a new file (in the `./solver/` folder advised), implement a class with a `.fit(x_data : np.ndarray)` method, add the mapping between a solver tag and the class in the `./solver/__init__.py` file, and add the configuration file in the `./configs/solver/` folder.
+
+The same goes for the task, and the metrics. This will allow you to easily compare different solvers, tasks, and metrics, and to easily add new ones, which is an excellent way of doing a research project.
+
 # Virtual environment
 
 For the sake of reproducibility, and to avoid conflicts with other projects, it is recommended to use a virtual environment. 
@@ -87,7 +93,7 @@ Cons : it is hard to compare experiments, and it is not very flexible.
 
 # Macros
 
-Command line macros are extremely useful to avoid typing the same commands over and over again. 
+Command line macros are extremely useful to avoid typing the same commands over and over again. This is just a small tip that I like to do, but it can save a lot of time.
 
 #### Linux
 
