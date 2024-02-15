@@ -14,13 +14,15 @@ from typing import Dict, Type
 import cProfile
 
 # ML libraries
+import random
 import numpy as np
 
 # Project imports
+from src.time_measure import RuntimeMeter
+from src.utils import try_get_seed
 from folder_tasks import task_name_to_TaskClass
 from folder_solvers import solver_name_to_SolverClass
 from folder_metrics import metrics_name_to_MetricsClass
-from src.time_measure import RuntimeMeter
 
 
 @hydra.main(config_path="configs", config_name="config_default.yaml")
@@ -35,6 +37,12 @@ def main(config: DictConfig):
     do_wandb: bool = config["do_wandb"]
     do_tb: bool = config["do_tb"]
     do_tqdm: bool = config["do_tqdm"]
+
+    # Set the seeds
+    seed = try_get_seed(config)
+    random.seed(seed)
+    np.random.seed(seed)
+    print(f"Using seed: {seed}")
 
     # Get the solver
     SolverClass = solver_name_to_SolverClass[solver_name]
@@ -77,9 +85,9 @@ def main(config: DictConfig):
                     y_pred=y_pred,
                     algo=solver,
                 )
-            metric_result["solver_time"] = rm.get_stage_runtime("solver")
-            metric_result["metric_time"] = rm.get_stage_runtime("metric")
-            metric_result["log_time"] = rm.get_stage_runtime("log")
+            for stage_name, stage_runtime in rm.get_stage_runtimes().items():
+                metric_result[f"runtime_{stage_name}"] = stage_runtime
+            metric_result["total_runtime"] = rm.get_total_runtime()
             metric_result["iteration"] = iteration
 
             with RuntimeMeter("log") as rm:

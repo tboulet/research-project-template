@@ -36,12 +36,40 @@ class RuntimeMeter:
 
     @staticmethod
     def get_stage_runtime(stage_name: str) -> float:
+        """Return the cumulative time taken by the stage.
+        If the stage_name is "total", it will return the total time taken by all stages.
+        If the stage_name is not found, it will return 0.
+
+        Args:
+            stage_name (str): the name of the stage, as it was used in the context manager.
+
+        Returns:
+            float: the cumulative time taken by the stage.
+        """
         if stage_name == "total":
             return sum(RuntimeMeter.stage_name_to_runtime.values())
         elif stage_name not in RuntimeMeter.stage_name_to_runtime:
             return 0
         else:
             return RuntimeMeter.stage_name_to_runtime[stage_name]
+
+    @staticmethod
+    def get_stage_runtimes() -> Dict[str, float]:
+        """Return a dictionnary mapping the stage names to the cumulative time taken by the stage.
+
+        Returns:
+            Dict[str, float]: the dictionnary mapping the stage names to the cumulative time taken by the stage.
+        """
+        return dict(RuntimeMeter.stage_name_to_runtime)
+
+    @staticmethod
+    def get_total_runtime() -> float:
+        """Return the total time taken by all stages.
+
+        Returns:
+            float: the total time taken by all stages.
+        """
+        return sum(RuntimeMeter.stage_name_to_runtime.values())
 
     def __init__(self, stage_name: str):
         self.stage_name = stage_name
