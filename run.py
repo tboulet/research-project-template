@@ -27,9 +27,10 @@ from folder_metrics import metrics_name_to_MetricsClass
 
 @hydra.main(config_path="configs", config_name="config_default.yaml")
 def main(config: DictConfig):
-
+    print("Configuration used :")
+    print(OmegaConf.to_yaml(config))
+    
     # Get the config values from the config object.
-    config = OmegaConf.to_container(config, resolve=True)
     solver_name: str = config["solver"]["name"]
     task_name: str = config["task"]["name"]
     n_iterations: int = config["n_iterations"]
@@ -45,10 +46,12 @@ def main(config: DictConfig):
     print(f"Using seed: {seed}")
 
     # Get the solver
+    print("Creating the solver...")
     SolverClass = solver_name_to_SolverClass[solver_name]
     solver = SolverClass(config=config["solver"]["config"])
 
     # Create the dataset
+    print("Creating the dataset...")
     TaskClass = task_name_to_TaskClass[task_name]
     task = TaskClass(config["task"]["config"])
     x_data = task.get_x_data()
@@ -61,7 +64,7 @@ def main(config: DictConfig):
 
     # Initialize loggers
     run_name = f"[{solver_name}]_[{task_name}]_{datetime.datetime.now().strftime('%dth%mmo_%Hh%Mmin%Ss')}_seed{np.random.randint(1000)}"
-    print(f"Starting run {run_name}")
+    print(f"\nStarting run {run_name}")
     if do_wandb:
         run = wandb.init(
             name=run_name,
@@ -117,7 +120,7 @@ if __name__ == "__main__":
     with cProfile.Profile() as pr:
         main()
     pr.dump_stats("logs/profile_stats.prof")
-    print("Profile stats dumped to profile_stats.prof")
+    print("\nProfile stats dumped to profile_stats.prof")
     print(
         "You can visualize the profile stats using snakeviz by running 'snakeviz logs/profile_stats.prof'"
     )
