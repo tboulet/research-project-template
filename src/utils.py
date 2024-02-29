@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 import numpy as np
 
@@ -34,3 +34,23 @@ def try_get_seed(config: Dict) -> int:
     except KeyError:
         seed = np.random.randint(0, 1000)
     return seed
+
+
+def try_get(
+    dictionnary: Dict, key: str, default: Union[int, float, str, None] = None
+) -> Any:
+    """Will try to extract the key from the dictionary, or return the default value if not found
+    or if the value is None
+
+    Args:
+        x (Dict): the dictionary
+        key (str): the key to extract
+        default (Union[int, float, str, None]): the default value
+
+    Returns:
+        Any: the value of the key if found, or the default value if not found
+    """
+    try:
+        return dictionnary[key] if dictionnary[key] is not None else default
+    except KeyError:
+        return default

@@ -1,4 +1,5 @@
 # Logging
+import os
 import wandb
 from tensorboardX import SummaryWriter
 
@@ -63,7 +64,8 @@ def main(config: DictConfig):
     }
 
     # Initialize loggers
-    run_name = f"[{solver_name}]_[{task_name}]_{datetime.datetime.now().strftime('%dth%mmo_%Hh%Mmin%Ss')}_seed{np.random.randint(1000)}"
+    run_name = f"[{solver_name}]_[{task_name}]_{datetime.datetime.now().strftime('%dth%mmo_%Hh%Mmin%Ss')}_seed{np.random.randint(seed)}"
+    os.makedirs("logs", exist_ok=True)
     print(f"\nStarting run {run_name}")
     if do_wandb:
         run = wandb.init(
