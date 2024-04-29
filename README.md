@@ -5,7 +5,8 @@ A template repository, for the objective of combining research and good code pra
 -   [**Virtual environment**](#virtual-environment)
 -   [**Configuration system (Hydra)**](#configuration-system)
 -   [**Logging (tensorboard, WandB, command line)**](#logging)
--   [**Other tips (macros, ...)**](#macros)
+-   [**Hyperparameter Sweep with WandB**](#hyperparameter-sweep-with-wandb)
+-   [**Other tips (macros, ...)**](#Other tips)
 
 # Repository structure
 The repository is structured as follows. Each point is detailed below.
@@ -27,11 +28,16 @@ The repository is structured as follows. Each point is detailed below.
 └── personal_files <- Personal files, ignored by git (e.g. notes, debugging test scripts, ...)
 ```
 
-The main point in this architecture is that you combine agnostically solvers, tasks, and metrics. You could add, change or remove those concepts if they don't fit your training paradigm. 
+This architecture is based on the fact that any research project requires a configuration, possibly decomposed into several sub-configurations (e.g. solver and task).
+The problem that requires to be solved is called a "task" (e.g. dataset, environment, problem, game, etc...) and the method that solves the problem is called a "solver" (e.g. algorithm, model, architecture, agent, etc...). 
+
+The configuration file is used to set the hyperparameters of the running experiment, and to choose the solver and the task, who are themselves defined in sub-configuration files in the `./configs/task/` and `./configs/solver/` folders. Combined with OOP and python interface (with abstract class) methods, this configuration framework allow you to agnostically combine any solver with any task, which allows easily to benchmark different solvers on different tasks.
+
+In this current repository, an example is given with a simple task : minimize the MSE between noise and polynomial functions. There is no training because this is a very proof of concept project, but the code is structured in a way that allows to easily add a training loop.
 
 For the solver, for example, you can easily add a new solver by adding a new file (in the `./solver/` folder advised), implement a class with a `.fit(x_data : np.ndarray)` method, add the mapping between a solver tag and the class in the `./solver/__init__.py` file, and add the configuration file in the `./configs/solver/` folder.
 
-The same goes for the task, and the metrics. This will allow you to easily compare different solvers, tasks, and metrics, and to easily add new ones, which is an excellent way of doing a research project.
+The same goes for the task, and the metrics. This will allow you to easily compare different solvers, tasks, and possibly other things (such as metrics, schedulers, ...), and to easily add new ones, which is an excellent way of doing a research project.
 
 # Virtual environment
 
@@ -52,10 +58,10 @@ pip install -r requirements.txt
 
 For a clean way of interacting with the code, it is advised to implement a Command Line Interface (CLI) and a configuration system. A simple approach is to use the ``argparse``, but I suggest to use [Hydra](https://hydra.cc/). Hydra is a framework that allows to easily create a CLI and a configuration system. It is very powerful and flexible, and allows to create a configuration tree.
 
-On this project for example, you can use the following command to run the code with the configuration `personal_config` in the `configs` folder.
+On this project for example, you can use the following command to run the code with the configuration `_personal_config` in the `configs` folder.
 
 ```bash
-python run.py --config-name personal_config
+python run.py --config-name _personal_config
 ```
 
 Or run the code with the default configuration but with a certain solver on a certain task :
@@ -67,7 +73,7 @@ python run.py solver=linear task=brownian
 You can also modify config parameters of the configuration file by using the following command :
 
 ```bash
-python run.py solver=linear task=brownian solver.lr=0.01
+python run.py solver=linear task=brownian solver.config.slope=4
 ```
 
 
@@ -97,7 +103,13 @@ CSV files are a simple way to log the results. It is good practice to log the re
 
 Cons : it is hard to compare experiments, and it is not very flexible.
 
-# Macros
+# Hyperparameter Sweep with WandB
+
+
+
+# Other tips
+
+## Macros
 
 Command line macros are extremely useful to avoid typing the same commands over and over again. This is just a small tip that I like to do, but it can save a lot of time.
 
@@ -115,11 +127,11 @@ On Windows, one method that worked well was to follow this StackOverflow [answer
 
 Some windows macros that i use can be found in the `usefull_files_for_a_project/macros.doskey` file.
 
-# Personal files
+## User-personal usefull files
 
 I advice to use files gitignored (there is a `personal_*` field in the `.gitignore` file) to store personal files, such as notes, debugging scripts, etc. It is a good practice to keep the repository clean and organized.
 
-# cProfile and SnakeViz
+## cProfile and SnakeViz
 
 cProfile is a module that allows to profile the code. It is very useful to find bottlenecks in the code, and to optimize it. As a developer that wants to optimize the speed of its code, your only criteria for 'how make my code faster' should be how much time the program spend on this function. Note : this is not necessarily the most frequent function.
 

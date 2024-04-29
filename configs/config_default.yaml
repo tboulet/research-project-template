@@ -10,11 +10,6 @@ do_tb : True
 do_cli : True
 do_tqdm : True
 
-# Metrics
-metrics:
-  mse : {}
-
-
 
 
 # Defaults sub-configs and other Hydra config.
