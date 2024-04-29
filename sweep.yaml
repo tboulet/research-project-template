@@ -1,0 +1,29 @@
+program: run.py 
+method: bayes
+metric:
+  goal: minimize
+  name: mse
+
+parameters:
+  solver.config.a:
+    min: -10
+    max: 10
+    distribution: uniform
+
+  solver.config.b:
+    min: 0.0001
+    max: 10
+    distribution: log_uniform_values
+
+  solver.config.c:
+    min: 1
+    max: 10
+    distribution: q_log_uniform_values
+
+command:
+  - venv\Scripts\python.exe
+  - ${program}
+  - --config-name=config_with_wandb
+  - solver=quadratic
+  - task=brownian
+  - ${args_no_hyphens}
