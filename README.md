@@ -6,7 +6,7 @@ A template repository, for the objective of combining research and good code pra
 -   [**Configuration system (Hydra)**](#configuration-system)
 -   [**Logging (tensorboard, WandB, command line)**](#logging)
 -   [**Hyperparameter Sweep with WandB**](#hyperparameter-sweep-with-wandb)
--   [**Other tips (macros, ...)**](#Other tips)
+-   [**Other tips (macros, ...)**](#other-tips)
 
 # Repository structure
 The repository is structured as follows. Each point is detailed below.
@@ -105,7 +105,18 @@ Cons : it is hard to compare experiments, and it is not very flexible.
 
 # Hyperparameter Sweep with WandB
 
+If you want to perform a hyperparameter sweep, several tools are available, including Optuna, Hydra's sweep and WandB's sweep. Hyperparameter sweeping becomes necessary when the number of hyperparameters becomes too large and/or the intuitive range of values becomes too unknown to be able to manually set them. I present here the WandB sweep, which is very easy to use and very powerful.
 
+You will have to run a wandb command for creating the sweep in the WandB platform, which will give you another WandB command for running the sweep. Here is an example of how to use it.
+
+```bash
+wandb sweep usefull_files_for_a_project/sweep.yaml
+wandb agent <sweep id given by the previous command>
+```
+
+The `sweep.yaml` file is a file that contains the configuration of the sweep. It is a simple file that allows to define the hyperparameters to sweep, the metric to optimize, the number of runs, etc. You can find an example in the `usefull_files_for_a_project/sweep.yaml` file.
+
+A complete documentation can be found [here](https://docs.wandb.ai/guides/sweeps) for how configuring the sweep. Features involve different prior distributions for the hyperparameters, early stopping, etc.
 
 # Other tips
 
