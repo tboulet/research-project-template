@@ -23,7 +23,7 @@ parameters:
 command:
   - venv\Scripts\python.exe
   - ${program}
-  - --config-name=config_with_wandb
+  - --config-name=config_benchmark
   - solver=quadratic
   - task=brownian
   - ${args_no_hyphens}
