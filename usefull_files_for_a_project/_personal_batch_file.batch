@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+## ============== This is the configuration proper to my cluster ==============
 
 #SBATCH --job-name=my_job
 #SBATCH --output=out.txt
@@ -18,10 +18,26 @@
 ## Walltime limit
 #SBATCH --time=24:00:00
 
-## Virtual environment
-source project_directory/venv_linux/bin/activate
 
-## Perform run
-mkdir -p logs
-cd project_directory
-python run.py --config-name personal_config.yaml do_wandb=False
+
+## ============== Run your job here ==============
+
+## Setup
+source path/to/your/venv/bin/activate
+cd path/to/your/project
+
+# Create a directory to store the logs
+initial_date=$(date +"%Y%m%d_%H%M%S")
+mkdir -p "logs/run_$initial_date"
+
+# Iterate over several seeds
+seed_max=10
+for seed in $(seq 1 $seed_max); do
+    # Option 1 : Run your experiment (this will log the logs in logs/run_$initial_date/seed_$seed.log)
+    python run.py --config-name benchmark seed=$seed > "logs/run_$initial_date/seed_$seed.log" 2>&1
+    # Option 2 : You run a benchmark. Compare at equal seeds
+    env_tags=(exp_uni exp_bi exp_tri exp_quad)
+    for env_tag in ${env_tags[@]}; do
+        python run.py --config-name benchmark env=env_tag seed=$seed > "logs/run_$initial_date/$env_tag/seed_$seed.log" 2>&1
+    done
+done
