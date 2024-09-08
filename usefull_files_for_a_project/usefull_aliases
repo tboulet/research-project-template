@@ -1,9 +1,0 @@
-# You should add those lines in your .bashrc (linux) or macros.doskey (windows)
-
-# Windows
-run=python run.py --config-name=personal_config do_wandb=False $*
-run_wandb=python run.py --config-name personal_config do_wandb=True $*
-
-# Linux
-alias run='python run.py --config-name=personal_config do_wandb=False $*'
-alias run_wandb='python run.py --config-name personal_config do_wandb=True $*'

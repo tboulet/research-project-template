@@ -1,49 +1,71 @@
+# Various commands
 ls=dir $*
 up=cd ..
 upp=cd ../..
 ex=exit
 ..=cd ..
 touch=type nul > $*
-user=cd C:\Users\timot
 mv=move $*
 rm=del $*   
+rmf=rd /s $*
 gs=git status
 ga=git add $*
 gc=git commit -m $*
 gpush=git push
 gpull=git pull
 
+# Python/CUDA installation and test
+cuda=nvcc --version
 python=py $*
+python37=C:\Users\timot\AppData\Local\Programs\Python\Python37\python.exe $*
+python39=C:\Users\timot\AppData\Local\Programs\Python\Python39\python.exe $*
+python310=C:\Users\timot\AppData\Local\Programs\Python\Python310\python.exe $*
 pip=py -m pip $*
 venv=py -m venv venv && venv\Scripts\activate
+activate=venv\Scripts\activate
 pip_reqs=py -m pip install -r requirements.txt
-pip_torch=py -m pip --no-cache-dir install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+pip_torch117_sus=py -m pip --no-cache-dir install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+pip_torch117=python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+pip_torch118=python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip_tf=py -m pip install "tensorflow<2.11"
 pip_basics=py -m pip install numpy scipy matplotlib tqdm wandb scikit-learn
 pip_cv2=py -m pip install opencv-python
 pip_plt=py -m pip install matplotlib
+test_torch=python -c "import torch; print('Cuda is available ?', torch.cuda.is_available())"
+test_tf=python -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000]))); print(tf.config.list_physical_devices())"
+test_jax=python -c "import jax; print(jax.devices())"
 
-activate=venv\Scripts\activate
+# Tensorboard
 tb=tensorboard --logdir=tensorboard
-pypi=py -m pip install build twine && python -m build && python -m twine upload dist/*
-test_tf=python -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
-test_torch=python -c "import torch"
-gpu_torch=python -c "import torch; print(torch.cuda.is_available())"
-gpu_tf=python -c "import tensorflow as tf; print(tf.config.list_physical_devices())"
-
-sna=snakeviz logs\profile.prof    
-ipynb2py=jupyter nbconvert $1 --to script
+tbd=rd /s /q tensorboard
 
 # Access to usefull files/folders
+user=cd C:\Users\timot
 macros=code C:\bat\macros.doskey
 pro=cd C:\Users\timot\projects
 cou=cd C:\Users\timot\courses
 debugger=code C:\Users\timot\projects\debugger
 papers=code C:\Users\timot\projects\papers
+leetcode=code C:\Users\timot\projects\leetcode
 
+# Code from files
+pr=type C:\Users\timot\data_files\$1
+pr_ls=dir C:\Users\timot\data_files
+pr_code=code C:\Users\timot\data_files
+wr=echo $1 > C:\Users\timot\data_files\$2
+
+# Miscelaneous
+sna=snakeviz logs\profile_stats.prof    
+ipynb2py=jupyter nbconvert $1 --to script
+pypi=py -m pip install build twine && python -m build && python -m twine upload dist/*
+kill_wsl=wsl --shutdown
 
 # Run scripts
-run=python run.py --config-name=personal_config do_wandb=False $*
-srun=python run.py --config-name personal_config do_wandb=False $* && snakeviz logs\profile.prof
+run=python run.py --config-name=personal_config $*
+runc=python run.py --config-name=$*
 run_wandb=python run.py --config-name personal_config do_wandb=True $*
+srun=python run.py --config-name personal_config do_wandb=False $* && snakeviz logs\profile.prof
+sweep=wandb sweep sweep.yaml
 pers=python personal_test.py
+cpers=code personal_test.py
+spers=python personal_test.py && snakeviz logs\profile.prof
