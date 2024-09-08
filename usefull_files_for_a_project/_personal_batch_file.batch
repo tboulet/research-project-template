@@ -1,5 +1,6 @@
 #!/bin/bash
-## ============== This is the configuration proper to my cluster ==============
+## ============== This is the configuration proper to my cluster (CentraleSupélec's DGX) ==============
+## Here it use the prod20 partition but you can change it to prod10, prod40 or prod80 by commenting/uncommenting the corresponding lines
 
 #SBATCH --job-name=my_job
 #SBATCH --output=out.txt
@@ -9,7 +10,25 @@
 #SBATCH --partition=prod10
 
 ## For gres: either 1g.10gb:[1:10] for prod10, 2g.20gb:[1:4] for prod20, 3g.40gb:1 for prod40 or A100.80gb for prod80.
-#SBATCH --gres=gpu:1g.10gb:1
+
+##SBATCH --partition=prod10
+##SBATCH --gres=gpu:1g.10gb:1
+##SBATCH --cpus-per-task=4
+
+#SBATCH --partition=prod20
+#SBATCH --gres=gpu:2g.20gb:1
+#SBATCH --cpus-per-task=4
+
+##SBATCH --partition=prod40
+##SBATCH --gres=gpu:3g.40gb:1
+##SBATCH --cpus-per-task=4
+
+##SBATCH --partition=prod80
+##SBATCH --gres=gpu:A100.80gb:1
+##SBATCH --ntasks-per-node=1
+##SBATCH --cpus-per-task=8
+##SBATCH --mem-per-cpu=10G
+##SBATCH --nodes=1
 
 ## For ntasks and cpus: total requested cpus (ntasks * cpus-per-task) must be in [1: 4 * nMIG] with nMIG = nb_1g.10gb | 2 * nb_2g.20gb | 4 * nb_3g.40gb | 8 * nb_A100.80gb
 #SBATCH --ntasks=1
@@ -31,13 +50,32 @@ initial_date=$(date +"%Y%m%d_%H%M%S")
 mkdir -p "logs/run_$initial_date"
 
 # Iterate over several seeds
-seed_max=10
-for seed in $(seq 1 $seed_max); do
-    # Option 1 : Run your experiment (this will log the logs in logs/run_$initial_date/seed_$seed.log)
-    python run.py --config-name benchmark seed=$seed > "logs/run_$initial_date/seed_$seed.log" 2>&1
-    # Option 2 : You run a benchmark. Compare at equal seeds
-    env_tags=(exp_uni exp_bi exp_tri exp_quad)
-    for env_tag in ${env_tags[@]}; do
-        python run.py --config-name benchmark env=env_tag seed=$seed > "logs/run_$initial_date/$env_tag/seed_$seed.log" 2>&1
+seed_max=100
+benchmark_name='my_benchmark'
+for _ in $(seq 1 $seed_max); do
+    # Generate a random seed
+    seed=$RANDOM
+    # Option 1 : If you run a simple experiment, run this
+    log_dir=logs/run_"$initial_date"
+    mkdir -p "$log_dir"
+    python run.py --config-name config_benchmark seed=$seed > $log_dir/seeds_$seed.logs 2>&1
+    # Option 2 : If you run a benchmark, run this
+    # This code is an example of a functionning .batch syntax for running a benchmark with multiple hyperparameters, including floats, lists of integers/strings, etc.
+    for hidden_dims_cnn in "[]" "[8]" "[8, 8]" "[8, 8, 8]"; do
+        for hidden_dims_mlp in "[]" "[10]" "[10, 10]"; do
+            for vision_range_agent in 1 4 7; do
+                for list_observations in "['visual_field', 'energy']" "['visual_field']"; do
+                    log_dir=logs/run_"$initial_date"/hidden_dims_cnn_"$hidden_dims_cnn"/hidden_dims_mlp_"$hidden_dims_mlp"/vision_range_agent_"$vision_range_agent"/list_observations_"$list_observations"
+                    mkdir -p "$log_dir"
+                    python run.py --config-name dgx do_wandb=True env/metrics=metrics_dgx +benchmark_name=$benchmark_name seed=$seed \
+                        model=cnn \
+                        model.cnn_config.hidden_dims="$hidden_dims_cnn" \
+                        model.mlp_config.hidden_dims="$hidden_dims_mlp" \
+                        env.vision_range_agent=$vision_range_agent \
+                        env.list_observations="$list_observations" \
+                        > "$log_dir/seeds_$seed.logs" 2>&1
+                done
+            done
+        done
     done
 done
