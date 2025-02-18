@@ -13,6 +13,7 @@ import datetime
 from time import time, sleep
 from typing import Dict, Type
 import cProfile
+from src.hydra_register import register_hydra_resolvers
 
 # ML libraries
 import random
@@ -24,6 +25,7 @@ from src.utils import try_get_seed
 from folder_tasks import task_name_to_TaskClass
 from folder_solvers import solver_name_to_SolverClass
 
+register_hydra_resolvers()
 
 @hydra.main(config_path="configs", config_name="config_default.yaml")
 def main(config: DictConfig):
